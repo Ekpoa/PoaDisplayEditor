@@ -1,0 +1,8 @@
+poa/poadisplayeditor/PoaDisplayEditor.class
+poa/poadisplayeditor/events/LoadEntity.class
+poa/poadisplayeditor/events/Click.class
+poa/poadisplayeditor/util/holders/GUIHolder.class
+poa/poadisplayeditor/events/Chat.class
+poa/poadisplayeditor/events/ClickBlockItem.class
+poa/poadisplayeditor/events/InventoryClick.class
+poa/poadisplayeditor/util/NearestEntity.class

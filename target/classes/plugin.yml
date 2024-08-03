@@ -1,0 +1,7 @@
+name: PoaDisplayEditor
+version: '1.0.0'
+main: poa.poadisplayeditor.PoaDisplayEditor
+api-version: '1.20.2'
+softdepend:
+    - PoaLib
+    - PlaceholderAPI

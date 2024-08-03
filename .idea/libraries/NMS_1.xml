@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="NMS-1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../PoaNMSApi/NMS/target/NMS-1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
