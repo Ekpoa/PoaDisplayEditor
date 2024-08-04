@@ -160,12 +160,12 @@ public class InventoryClick implements Listener {
             }
             case "spawnitem" -> {
                 final Entity entity = player.getWorld().spawn(player.getLocation(), ItemDisplay.class);
-                player.sendRichMessage("<green>Successfully spawned block display");
+                player.sendRichMessage("<green>Successfully spawned item display");
                 editingMap.put(uuid, entity);
             }
             case "spawntext" -> {
                 final Entity entity = player.getWorld().spawn(player.getLocation(), TextDisplay.class);
-                player.sendRichMessage("<green>Successfully spawned block display");
+                player.sendRichMessage("<green>Successfully spawned text display");
                 editingMap.put(uuid, entity);
             }
 
@@ -449,7 +449,7 @@ public class InventoryClick implements Listener {
             case "background" -> {
                 player.closeInventory();
 
-                player.sendRichMessage("<green>Type in chat the R G B for the background, eg, 255 100 255");
+                player.sendRichMessage("<green>Type in chat the R G B A for the background, eg, 255 100 255 255 <gray>The alpha is optional");
                 backgroundMap.put(uuid, (TextDisplay) selected);
             }
 
