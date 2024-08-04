@@ -66,6 +66,7 @@ public class Click implements Listener {
         inventory.setItem(24, inventoryItem(Material.MINECART, "<green>Move Along X", "movex", "<gray>Left click to increase", "<gray>Right click to decrease"));
         inventory.setItem(26, inventoryItem(Material.MINECART, "<green>Move Along Z", "movez", "<gray>Left click to increase", "<gray>Right click to decrease"));
         inventory.setItem(16, inventoryItem(Material.MINECART, "<green>Center To Block", "moveblock"));
+        inventory.setItem(34, inventoryItem(Material.COMMAND_BLOCK_MINECART, "<green>Easy Move", "moveeasy"));
 
         inventory.setItem(33, inventoryItem(Material.REDSTONE_TORCH, "<green>Change Pitch", "pitch", "<gray>Middle click to set"));
         inventory.setItem(35, inventoryItem(Material.REDSTONE_TORCH, "<green>Change Yaw", "yaw", "<gray>Middle click to set"));
@@ -82,7 +83,7 @@ public class Click implements Listener {
         inventory.setItem(36, potionColor(inventoryItem(Material.LINGERING_POTION, "<green>Glow Value", "glowoverride"), 0, 0, 0));
         inventory.setItem(37, potionColor(inventoryItem(Material.LINGERING_POTION, "<green>Glow State", "glow"), 255, 255, 255));
 
-        inventory.setItem(39, inventoryItem(Material.BLACK_CONCRETE, "<green>Brightness", "brightness"));
+        inventory.setItem(39, inventoryItem(Material.LIGHT, "<green>Brightness", "brightness"));
 
         inventory.setItem(41, inventoryItem(Material.ARMOR_STAND, "<green>Billboard Fixed", "billboardfixed"));
         inventory.setItem(42, inventoryItem(Material.ARMOR_STAND, "<green>Billboard vertical", "billboardvertical"));
@@ -93,10 +94,11 @@ public class Click implements Listener {
         inventory.setItem(47, inventoryItem(Material.WRITTEN_BOOK, "<green>Select Nearest Text Display", "selecttext"));
         inventory.setItem(45, inventoryItem(Material.ANVIL, "<green>Select Nearest Block Display", "selectblock"));
         inventory.setItem(46, inventoryItem(Material.DIAMOND, "<green>Select Nearest Item Display", "selectitem"));
+        inventory.setItem(48, inventoryItem(Material.PAINTING, "<green>Easy Select", "selecteasy"));
 
         inventory.setItem(22, inventoryItem(Material.BARRIER, "<red>DELETE", "delete"));
 
-        inventory.setItem(49, inventoryItem(Material.NETHER_STAR, "<gold>Information", "",
+        inventory.setItem(31, inventoryItem(Material.NETHER_STAR, "<gold>Information", "",
                 "<yellow>Left Click To Increase",
                 "<yellow>Right Click To Decrease"
         ));

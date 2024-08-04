@@ -1,6 +1,7 @@
 package poa.poadisplayeditor.events;
 
 import io.papermc.paper.event.player.PlayerTrackEntityEvent;
+import io.papermc.paper.event.player.PlayerUntrackEntityEvent;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
@@ -15,6 +16,8 @@ import poa.packets.SendPacket;
 import poa.poadisplayeditor.PoaDisplayEditor;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 public class LoadEntity implements Listener {
 
@@ -48,7 +51,28 @@ public class LoadEntity implements Listener {
         for (Player p : nearbyPlayers) {
             changeText(p, display);
         }
+    }
 
+
+
+    @EventHandler
+    public void unloadEntity(PlayerUntrackEntityEvent e){
+        final Player player = e.getPlayer();
+        final UUID uuid = player.getUniqueId();
+        if(!InventoryClick.entityListMap.containsKey(uuid))
+            return;
+
+        final List<Entity> entityList = InventoryClick.entityListMap.get(uuid);
+        final Entity entity = e.getEntity();
+        if(!entityList.contains(entity))
+            return;
+
+        entityList.remove(entity);
+        entity.remove();
+        if(entityList.isEmpty())
+            InventoryClick.entityListMap.remove(uuid);
+
+        InventoryClick.entityListMap.put(uuid, entityList);
     }
 
 }

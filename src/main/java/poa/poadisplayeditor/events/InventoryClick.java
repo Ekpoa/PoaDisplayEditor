@@ -6,6 +6,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,9 +19,10 @@ import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import poa.packets.FakeEntity;
+import poa.packets.SendPacket;
 import poa.poadisplayeditor.util.NearestEntity;
 import poa.poadisplayeditor.util.holders.GUIHolder;
-import poa.poalib.Items.CreateItem;
 import poa.poalib.shaded.NBT;
 
 import java.util.*;
@@ -32,7 +34,9 @@ public class InventoryClick implements Listener {
 
     public static Map<UUID, Display> selectItemMap = new HashMap<>();
 
-    public static Map<UUID, Float> moveMountMap = new HashMap<>();
+    public static Map<UUID, Float> moveAmountMap = new HashMap<>();
+
+    public static Map<UUID, Display> easyMoveMap = new HashMap<>();
 
     public static Map<UUID, Display> pitchMap = new HashMap<>();
     public static Map<UUID, Display> yawMap = new HashMap<>();
@@ -45,6 +49,8 @@ public class InventoryClick implements Listener {
     public static Map<UUID, Display> glowMap = new HashMap<>();
     public static Map<UUID, TextDisplay> backgroundMap = new HashMap<>();
     public static Map<UUID, TextDisplay> widthMap = new HashMap<>();
+
+    public static Map<UUID, List<Entity>> entityListMap = new HashMap<>();
 
 
     @SneakyThrows
@@ -69,7 +75,7 @@ public class InventoryClick implements Listener {
 
         String type = t[0];
 
-        if (!List.of("selectblock", "selecttext", "selectitem").contains(type) && !editingMap.containsKey(uuid)) {
+        if (!List.of("selectblock", "selecttext", "selectitem", "selecteasy").contains(type) && !editingMap.containsKey(uuid)) {
             player.sendRichMessage("<red>Select an entity first");
             return;
         }
@@ -79,7 +85,7 @@ public class InventoryClick implements Listener {
 
         switch (type.toLowerCase()) {
             case "selecttext" -> {
-                final Entity entity = NearestEntity.getNearestEntityByType(player, TextDisplay.class, 10);
+                final Entity entity = NearestEntity.getNearestEntityByType(player.getLocation(), TextDisplay.class, 10);
                 if (entity == null) {
                     player.sendRichMessage("<red>No Text Display Found");
                     return;
@@ -89,7 +95,7 @@ public class InventoryClick implements Listener {
                 player.sendRichMessage("<green>Selected");
             }
             case "selectblock" -> {
-                final Entity entity = NearestEntity.getNearestEntityByType(player, BlockDisplay.class, 10);
+                final Entity entity = NearestEntity.getNearestEntityByType(player.getLocation(), BlockDisplay.class, 10);
                 if (entity == null) {
                     player.sendRichMessage("<red>No Text Display Found");
                     return;
@@ -99,7 +105,7 @@ public class InventoryClick implements Listener {
                 player.sendRichMessage("<green>Selected");
             }
             case "selectitem" -> {
-                final Entity entity = NearestEntity.getNearestEntityByType(player, ItemDisplay.class, 10);
+                final Entity entity = NearestEntity.getNearestEntityByType(player.getLocation(), ItemDisplay.class, 10);
                 if (entity == null) {
                     player.sendRichMessage("<red>No Item Display Found");
                     return;
@@ -107,6 +113,43 @@ public class InventoryClick implements Listener {
 
                 editingMap.put(uuid, entity);
                 player.sendRichMessage("<green>Selected");
+            }
+
+            case "selecteasy" -> {
+                final Location location = player.getLocation();
+                final Collection<Display> nearby = location.getNearbyEntitiesByType(Display.class, 10);
+
+                if (nearby.isEmpty()) {
+                    player.sendRichMessage("<red>No Nearby Display Entities");
+                    return;
+                }
+                final World world = player.getWorld();
+
+                final Collection<Player> nearbyPlayers = location.getNearbyPlayers(200);
+
+                List<Entity> entityList = new ArrayList<>();
+                List<Integer> idList = new ArrayList<>();
+                for (Display display : nearby) {
+                    final ArmorStand armorStand = world.spawn(display.getLocation(), ArmorStand.class, (stand) -> {
+                        stand.setCanTick(false);
+                        stand.setSmall(true);
+                        stand.setInvulnerable(true);
+                        stand.setPersistent(false);
+                    });
+                    entityList.add(armorStand);
+                    idList.add(armorStand.getEntityId());
+
+                }
+                entityListMap.put(uuid, entityList);
+
+                for (Player p : nearbyPlayers) {
+                    if(p == player)
+                        continue;
+                    SendPacket.sendPacket(p, FakeEntity.removeFakeEntityPacket(idList));
+                }
+
+
+                player.sendRichMessage("<green>All nearby display entities are shown as armor stands, click on it");
             }
 
 
@@ -141,7 +184,7 @@ public class InventoryClick implements Listener {
             }
 
             case "settext" -> {
-                if(!(selected instanceof TextDisplay)){
+                if (!(selected instanceof TextDisplay)) {
                     player.sendRichMessage("<red>Selected display is not a text display");
                     return;
                 }
@@ -152,19 +195,19 @@ public class InventoryClick implements Listener {
 
             case "move0.1" -> {
                 player.sendRichMessage("<green>Set move amount to 0.1");
-                moveMountMap.put(uuid, 0.1F);
+                moveAmountMap.put(uuid, 0.1F);
             }
             case "move0.5" -> {
                 player.sendRichMessage("<green>Set move amount to 0.5");
-                moveMountMap.put(uuid, 0.5F);
+                moveAmountMap.put(uuid, 0.5F);
             }
             case "move1" -> {
                 player.sendRichMessage("<green>Set move amount to 1");
-                moveMountMap.put(uuid, 1F);
+                moveAmountMap.put(uuid, 1F);
             }
             case "move5" -> {
                 player.sendRichMessage("<green>Set move amount to 5");
-                moveMountMap.put(uuid, 5F);
+                moveAmountMap.put(uuid, 5F);
             }
 
 
@@ -199,6 +242,16 @@ public class InventoryClick implements Listener {
             case "moveblock" -> {
                 selected.teleport(selected.getLocation().getBlock().getLocation());
                 player.sendRichMessage("<green>Centered to block");
+            }
+            case "moveeasy" -> {
+                if (moveAmount == 0) {
+                    player.sendRichMessage("<red>You must select a move amount first");
+                    return;
+                }
+
+                player.closeInventory();
+                player.sendRichMessage("<green>Use the scroll wheel to move the entity, reopen the gui when completed");
+                easyMoveMap.put(uuid, selected);
             }
 
 
@@ -306,28 +359,26 @@ public class InventoryClick implements Listener {
             }
 
 
-
             case "brightness" -> {
                 final Display.Brightness brightness = selected.getBrightness();
                 int amount = 15;
-                if(brightness != null)
+                if (brightness != null)
                     amount = brightness.getBlockLight();
 
-                if(e.isRightClick())
+                if (e.isRightClick())
                     amount--;
                 else
                     amount++;
 
-                if(amount > 15)
+                if (amount > 15)
                     amount = 15;
-                else if(amount < 0)
+                else if (amount < 0)
                     amount = 0;
 
                 selected.setBrightness(new Display.Brightness(amount, amount));
 
                 player.sendRichMessage("<green>Modified brightness to " + amount);
             }
-
 
 
             case "billboardfixed" -> {
@@ -363,8 +414,6 @@ public class InventoryClick implements Listener {
                 selected.setGlowing(!selected.isGlowing());
                 player.sendRichMessage("<green>Toggled glowing state");
             }
-
-
 
 
             case "cleartext" -> {
@@ -436,9 +485,7 @@ public class InventoryClick implements Listener {
     }
 
 
-
-
-    private static Inventory textGui(){
+    private static Inventory textGui() {
         Inventory inventory = Bukkit.createInventory(new GUIHolder(), InventoryType.DROPPER, MiniMessage.miniMessage().deserialize("<gold>Text"));
 
         inventory.setItem(0, Click.inventoryItem(Material.RED_STAINED_GLASS_PANE, "<red>Clear Text", "cleartext"));
@@ -456,18 +503,11 @@ public class InventoryClick implements Listener {
     }
 
 
-    public static String getTextComponentText(TextDisplay textDisplay){
+    public static String getTextComponentText(TextDisplay textDisplay) {
         final Component text = textDisplay.text();
 
         return MiniMessage.miniMessage().serialize(text);
     }
-
-
-
-
-
-
-
 
 
     private static @NotNull Transformation translationModify(Display selected, Vector3f modifyScaleBy, Vector3f modifyTranslationBy) {
@@ -496,11 +536,11 @@ public class InventoryClick implements Listener {
 
     private static float getMoveAmount(Player player, boolean rightClick) {
         final UUID uuid = player.getUniqueId();
-        if (!moveMountMap.containsKey(uuid))
+        if (!moveAmountMap.containsKey(uuid))
             return 0;
 
 
-        Float move = moveMountMap.get(uuid);
+        Float move = moveAmountMap.get(uuid);
         if (rightClick)
             move = move * -1;
 
