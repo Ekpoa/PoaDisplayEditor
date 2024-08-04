@@ -75,7 +75,7 @@ public class InventoryClick implements Listener {
 
         String type = t[0];
 
-        if (!List.of("selectblock", "selecttext", "selectitem", "selecteasy").contains(type) && !editingMap.containsKey(uuid)) {
+        if (!List.of("selectblock", "selecttext", "selectitem", "selecteasy", "spawnblock", "spawntext", "spawnitem").contains(type) && !editingMap.containsKey(uuid)) {
             player.sendRichMessage("<red>Select an entity first");
             return;
         }
