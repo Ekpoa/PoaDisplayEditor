@@ -72,9 +72,11 @@ public class Click implements Listener {
         inventory.setItem(35, inventoryItem(Material.REDSTONE_TORCH, "<green>Change Yaw", "yaw", "<gray>Middle click to set"));
 
 
+        inventory.setItem(50, inventoryItem(Material.REPEATING_COMMAND_BLOCK, "<green>Scale All", "scaleall"));
         inventory.setItem(51, inventoryItem(Material.COMMAND_BLOCK, "<green>Scale X", "scalex"));
         inventory.setItem(52, inventoryItem(Material.COMMAND_BLOCK, "<green>Scale Y", "scaley"));
         inventory.setItem(53, inventoryItem(Material.COMMAND_BLOCK, "<green>Scale Z", "scalez"));
+
 
         inventory.setItem(19, inventoryItem(Material.POWERED_RAIL, "<green>Translation X", "translationx"));
         inventory.setItem(27, inventoryItem(Material.POWERED_RAIL, "<green>Translation Y", "translationy"));
@@ -86,9 +88,9 @@ public class Click implements Listener {
         inventory.setItem(39, inventoryItem(Material.LIGHT, "<green>Brightness", "brightness"));
 
         inventory.setItem(41, inventoryItem(Material.ARMOR_STAND, "<green>Billboard Fixed", "billboardfixed"));
-        inventory.setItem(42, inventoryItem(Material.ARMOR_STAND, "<green>Billboard vertical", "billboardvertical"));
-        inventory.setItem(43, inventoryItem(Material.ARMOR_STAND, "<green>Billboard horizontal", "billboardhorizontal"));
-        inventory.setItem(44, inventoryItem(Material.ARMOR_STAND, "<green>Billboard center", "billboardcenter"));
+        inventory.setItem(42, inventoryItem(Material.ARMOR_STAND, "<green>Billboard Vertical", "billboardvertical"));
+        inventory.setItem(43, inventoryItem(Material.ARMOR_STAND, "<green>Billboard Horizontal", "billboardhorizontal"));
+        inventory.setItem(44, inventoryItem(Material.ARMOR_STAND, "<green>Billboard Center", "billboardcenter"));
 
 
         inventory.setItem(47, inventoryItem(Material.WRITTEN_BOOK, "<green>Select Nearest Text Display", "selecttext"));

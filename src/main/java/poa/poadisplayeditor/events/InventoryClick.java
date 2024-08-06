@@ -325,6 +325,16 @@ public class InventoryClick implements Listener {
                 selected.setTransformation(newTransform);
                 player.sendRichMessage("<green>Extended Z scale by " + moveAmount);
             }
+            case "scaleall" -> {
+                if (moveAmount == 0) {
+                    player.sendRichMessage("<red>You must select a move amount first");
+                    return;
+                }
+
+                final Transformation newTransform = modifyScale(selected, new Vector3f(moveAmount, moveAmount, moveAmount));
+                selected.setTransformation(newTransform);
+                player.sendRichMessage("<green>Extended Z scale by " + moveAmount);
+            }
 
 
             case "translationx" -> {
