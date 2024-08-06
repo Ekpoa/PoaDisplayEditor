@@ -7,6 +7,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -36,10 +38,10 @@ public class InventoryClick implements Listener {
 
     public static Map<UUID, Float> moveAmountMap = new HashMap<>();
 
-    public static Map<UUID, Display> easyMoveMap = new HashMap<>();
+    public static Map<UUID, Entity> easyMoveMap = new HashMap<>();
 
-    public static Map<UUID, Display> pitchMap = new HashMap<>();
-    public static Map<UUID, Display> yawMap = new HashMap<>();
+    public static Map<UUID, Entity> pitchMap = new HashMap<>();
+    public static Map<UUID, Entity> yawMap = new HashMap<>();
 
     public static Map<UUID, TextDisplay> appendTextMap = new HashMap<>();
     public static Map<UUID, TextDisplay> newLineTextMap = new HashMap<>();
@@ -75,12 +77,18 @@ public class InventoryClick implements Listener {
 
         String type = t[0];
 
-        if (!List.of("selectblock", "selecttext", "selectitem", "selecteasy", "spawnblock", "spawntext", "spawnitem").contains(type) && !editingMap.containsKey(uuid)) {
+        if (!List.of("selectblock", "selecttext", "selectitem", "selecteasy", "selectentity", "spawnblock", "spawntext", "spawnitem").contains(type) && !editingMap.containsKey(uuid)) {
             player.sendRichMessage("<red>Select an entity first");
             return;
         }
 
-        Display selected = (Display) editingMap.get(uuid);
+
+        Display selectedDisplay = null;
+
+        final Entity selectedEntity = editingMap.get(uuid);
+        if (selectedEntity instanceof Display display)
+            selectedDisplay = display;
+
         float moveAmount = getMoveAmount(player, e.isRightClick());
 
         switch (type.toLowerCase()) {
@@ -114,6 +122,17 @@ public class InventoryClick implements Listener {
                 editingMap.put(uuid, entity);
                 player.sendRichMessage("<green>Selected");
             }
+            case "selectentity" -> {
+                final Entity entity = NearestEntity.getNearestEntityByType(player.getLocation(), LivingEntity.class, 10, true);
+                if (entity == null) {
+                    player.sendRichMessage("<red>No Living Entity Found");
+                    return;
+                }
+
+                editingMap.put(uuid, entity);
+                player.sendRichMessage("<green>Selected " + entity.getType());
+                player.sendRichMessage("<red>Using anything other than move, yaw, pitch or scale will throw console errors");
+            }
 
             case "selecteasy" -> {
                 final Location location = player.getLocation();
@@ -143,7 +162,7 @@ public class InventoryClick implements Listener {
                 entityListMap.put(uuid, entityList);
 
                 for (Player p : nearbyPlayers) {
-                    if(p == player)
+                    if (p == player)
                         continue;
                     SendPacket.sendPacket(p, FakeEntity.removeFakeEntityPacket(idList));
                 }
@@ -172,7 +191,7 @@ public class InventoryClick implements Listener {
             case "setblock", "setitem" -> {
                 final Entity entity = editingMap.get(uuid);
                 if (entity instanceof TextDisplay) {
-                    player.sendRichMessage("<red>You do not have a block or item display selected");
+                    player.sendRichMessage("<red>You do not have a block or item display selectedDisplay");
                     return;
                 }
 
@@ -184,7 +203,7 @@ public class InventoryClick implements Listener {
             }
 
             case "settext" -> {
-                if (!(selected instanceof TextDisplay)) {
+                if (!(selectedDisplay instanceof TextDisplay)) {
                     player.sendRichMessage("<red>Selected display is not a text display");
                     return;
                 }
@@ -192,7 +211,10 @@ public class InventoryClick implements Listener {
                 player.openInventory(textGui());
             }
 
-
+            case "move0.01" -> {
+                player.sendRichMessage("<green>Set move amount to 0.01");
+                moveAmountMap.put(uuid, 0.01F);
+            }
             case "move0.1" -> {
                 player.sendRichMessage("<green>Set move amount to 0.1");
                 moveAmountMap.put(uuid, 0.1F);
@@ -217,7 +239,7 @@ public class InventoryClick implements Listener {
                     return;
                 }
 
-                selected.teleport(selected.getLocation().clone().add(0, moveAmount, 0));
+                selectedEntity.teleport(selectedEntity.getLocation().clone().add(0, moveAmount, 0));
                 player.sendRichMessage("<green>Moved along Y by " + moveAmount);
             }
             case "movex" -> {
@@ -227,7 +249,7 @@ public class InventoryClick implements Listener {
                 }
 
 
-                selected.teleport(selected.getLocation().clone().add(moveAmount, 0, 0));
+                selectedEntity.teleport(selectedEntity.getLocation().clone().add(moveAmount, 0, 0));
                 player.sendRichMessage("<green>Moved along X by " + moveAmount);
             }
             case "movez" -> {
@@ -236,11 +258,11 @@ public class InventoryClick implements Listener {
                     return;
                 }
 
-                selected.teleport(selected.getLocation().clone().add(0, 0, moveAmount));
+                selectedEntity.teleport(selectedEntity.getLocation().clone().add(0, 0, moveAmount));
                 player.sendRichMessage("<green>Moved along Z by " + moveAmount);
             }
             case "moveblock" -> {
-                selected.teleport(selected.getLocation().getBlock().getLocation());
+                selectedEntity.teleport(selectedEntity.getLocation().getBlock().getLocation());
                 player.sendRichMessage("<green>Centered to block");
             }
             case "moveeasy" -> {
@@ -251,7 +273,7 @@ public class InventoryClick implements Listener {
 
                 player.closeInventory();
                 player.sendRichMessage("<green>Use the scroll wheel to move the entity, reopen the gui when completed");
-                easyMoveMap.put(uuid, selected);
+                easyMoveMap.put(uuid, selectedEntity);
             }
 
 
@@ -259,7 +281,7 @@ public class InventoryClick implements Listener {
                 if (e.getClick() == ClickType.MIDDLE) {
                     player.closeInventory();
                     player.sendRichMessage("<green>Type into chat the amount to set the pitch to");
-                    pitchMap.put(uuid, selected);
+                    pitchMap.put(uuid, selectedEntity);
                     return;
                 }
 
@@ -269,16 +291,16 @@ public class InventoryClick implements Listener {
                     return;
                 }
 
-                final Location clone = selected.getLocation().clone();
-                clone.setPitch(selected.getPitch() + moveAmount);
-                selected.teleport(clone);
-                player.sendRichMessage("<green>Moved pitch by " + moveAmount + " pitch: " + selected.getPitch());
+                final Location clone = selectedEntity.getLocation().clone();
+                clone.setPitch(selectedEntity.getPitch() + moveAmount);
+                selectedEntity.teleport(clone);
+                player.sendRichMessage("<green>Moved pitch by " + moveAmount + " pitch: " + selectedEntity.getPitch());
             }
             case "yaw" -> {
                 if (e.getClick() == ClickType.MIDDLE) {
                     player.closeInventory();
                     player.sendRichMessage("<green>Type into chat the amount to set the pitch to");
-                    yawMap.put(uuid, selected);
+                    yawMap.put(uuid, selectedEntity);
                     return;
                 }
 
@@ -288,10 +310,10 @@ public class InventoryClick implements Listener {
                     return;
                 }
 
-                final Location clone = selected.getLocation().clone();
-                clone.setYaw(selected.getYaw() + moveAmount);
-                selected.teleport(clone);
-                player.sendRichMessage("<green>Moved yaw by " + moveAmount + " yaw: " + selected.getYaw());
+                final Location clone = selectedEntity.getLocation().clone();
+                clone.setYaw(selectedEntity.getYaw() + moveAmount);
+                selectedEntity.teleport(clone);
+                player.sendRichMessage("<green>Moved yaw by " + moveAmount + " yaw: " + selectedEntity.getYaw());
             }
 
 
@@ -301,8 +323,8 @@ public class InventoryClick implements Listener {
                     return;
                 }
 
-                final Transformation newTransform = modifyScale(selected, new Vector3f(moveAmount, 0, 0));
-                selected.setTransformation(newTransform);
+                final Transformation newTransform = modifyScale(selectedDisplay, new Vector3f(moveAmount, 0, 0));
+                selectedDisplay.setTransformation(newTransform);
                 player.sendRichMessage("<green>Extended X scale by " + moveAmount);
             }
             case "scaley" -> {
@@ -311,8 +333,8 @@ public class InventoryClick implements Listener {
                     return;
                 }
 
-                final Transformation newTransform = modifyScale(selected, new Vector3f(0, moveAmount, 0));
-                selected.setTransformation(newTransform);
+                final Transformation newTransform = modifyScale(selectedDisplay, new Vector3f(0, moveAmount, 0));
+                selectedDisplay.setTransformation(newTransform);
                 player.sendRichMessage("<green>Extended Y scale by " + moveAmount);
             }
             case "scalez" -> {
@@ -321,8 +343,8 @@ public class InventoryClick implements Listener {
                     return;
                 }
 
-                final Transformation newTransform = modifyScale(selected, new Vector3f(0, 0, moveAmount));
-                selected.setTransformation(newTransform);
+                final Transformation newTransform = modifyScale(selectedDisplay, new Vector3f(0, 0, moveAmount));
+                selectedDisplay.setTransformation(newTransform);
                 player.sendRichMessage("<green>Extended Z scale by " + moveAmount);
             }
             case "scaleall" -> {
@@ -331,9 +353,22 @@ public class InventoryClick implements Listener {
                     return;
                 }
 
-                final Transformation newTransform = modifyScale(selected, new Vector3f(moveAmount, moveAmount, moveAmount));
-                selected.setTransformation(newTransform);
-                player.sendRichMessage("<green>Extended Z scale by " + moveAmount);
+                if (selectedDisplay != null) {
+                    final Transformation newTransform = modifyScale(selectedDisplay, new Vector3f(moveAmount, moveAmount, moveAmount));
+                    selectedDisplay.setTransformation(newTransform);
+                    player.sendRichMessage("<green>Extended all values scale by " + moveAmount);
+                } else {
+                    if (!(selectedEntity instanceof LivingEntity li)) {
+                        player.sendRichMessage("<red>Selected entity is not a display or living entity");
+                        return;
+                    }
+                    final AttributeInstance attribute = li.getAttribute(Attribute.GENERIC_SCALE);
+                    if (attribute == null) {
+                        player.sendRichMessage("<red>This entity cannot be scaled");
+                        return;
+                    }
+                    attribute.setBaseValue(attribute.getValue() + moveAmount);
+                }
             }
 
 
@@ -343,8 +378,8 @@ public class InventoryClick implements Listener {
                     return;
                 }
 
-                final Transformation newTransform = modifyTranslation(selected, new Vector3f(moveAmount, 0, 0));
-                selected.setTransformation(newTransform);
+                final Transformation newTransform = modifyTranslation(selectedDisplay, new Vector3f(moveAmount, 0, 0));
+                selectedDisplay.setTransformation(newTransform);
                 player.sendRichMessage("<green>Extended X translation by " + moveAmount);
             }
             case "translationy" -> {
@@ -353,8 +388,8 @@ public class InventoryClick implements Listener {
                     return;
                 }
 
-                final Transformation newTransform = modifyTranslation(selected, new Vector3f(0, moveAmount, 0));
-                selected.setTransformation(newTransform);
+                final Transformation newTransform = modifyTranslation(selectedDisplay, new Vector3f(0, moveAmount, 0));
+                selectedDisplay.setTransformation(newTransform);
                 player.sendRichMessage("<green>Extended Y translation by " + moveAmount);
             }
             case "translationz" -> {
@@ -363,14 +398,14 @@ public class InventoryClick implements Listener {
                     return;
                 }
 
-                final Transformation newTransform = modifyTranslation(selected, new Vector3f(0, 0, moveAmount));
-                selected.setTransformation(newTransform);
+                final Transformation newTransform = modifyTranslation(selectedDisplay, new Vector3f(0, 0, moveAmount));
+                selectedDisplay.setTransformation(newTransform);
                 player.sendRichMessage("<green>Extended Z translation by " + moveAmount);
             }
 
 
             case "brightness" -> {
-                final Display.Brightness brightness = selected.getBrightness();
+                final Display.Brightness brightness = selectedDisplay.getBrightness();
                 int amount = 15;
                 if (brightness != null)
                     amount = brightness.getBlockLight();
@@ -385,31 +420,31 @@ public class InventoryClick implements Listener {
                 else if (amount < 0)
                     amount = 0;
 
-                selected.setBrightness(new Display.Brightness(amount, amount));
+                selectedDisplay.setBrightness(new Display.Brightness(amount, amount));
 
                 player.sendRichMessage("<green>Modified brightness to " + amount);
             }
 
 
             case "billboardfixed" -> {
-                selected.setBillboard(Display.Billboard.FIXED);
+                selectedDisplay.setBillboard(Display.Billboard.FIXED);
                 player.sendRichMessage("<green>Set Billboard to Fixed");
             }
             case "billboardvertical" -> {
-                selected.setBillboard(Display.Billboard.VERTICAL);
+                selectedDisplay.setBillboard(Display.Billboard.VERTICAL);
                 player.sendRichMessage("<green>Set Billboard to Vertical");
             }
             case "billboardhorizontal" -> {
-                selected.setBillboard(Display.Billboard.HORIZONTAL);
+                selectedDisplay.setBillboard(Display.Billboard.HORIZONTAL);
                 player.sendRichMessage("<green>Set Billboard to Horizontal");
             }
             case "billboardcenter" -> {
-                selected.setBillboard(Display.Billboard.CENTER);
+                selectedDisplay.setBillboard(Display.Billboard.CENTER);
                 player.sendRichMessage("<green>Set Billboard to Center");
             }
 
             case "delete" -> {
-                selected.remove();
+                selectedDisplay.remove();
                 player.sendRichMessage("<green>Display Deleted :(");
             }
 
@@ -417,21 +452,21 @@ public class InventoryClick implements Listener {
                 player.closeInventory();
 
                 player.sendRichMessage("<green>Type in chat the R G B for the glow, eg, 255 100 255");
-                glowMap.put(uuid, selected);
+                glowMap.put(uuid, selectedDisplay);
             }
             case "glow" -> {
                 player.closeInventory();
-                selected.setGlowing(!selected.isGlowing());
+                selectedDisplay.setGlowing(!selectedDisplay.isGlowing());
                 player.sendRichMessage("<green>Toggled glowing state");
             }
 
 
             case "cleartext" -> {
-                ((TextDisplay) selected).text(null);
+                ((TextDisplay) selectedDisplay).text(null);
                 player.sendRichMessage("<green>Cleared all text");
             }
             case "appendline" -> {
-                final TextDisplay textDisplay = (TextDisplay) selected;
+                final TextDisplay textDisplay = (TextDisplay) selectedDisplay;
                 player.closeInventory();
 
                 player.sendRichMessage("<green>Type in chat the text to append, MiniMessages supported");
@@ -439,7 +474,7 @@ public class InventoryClick implements Listener {
             }
 
             case "addline" -> {
-                final TextDisplay textDisplay = (TextDisplay) selected;
+                final TextDisplay textDisplay = (TextDisplay) selectedDisplay;
                 player.closeInventory();
 
                 player.sendRichMessage("<green>Type in chat the text to add to a new line, MiniMessages supported");
@@ -447,7 +482,7 @@ public class InventoryClick implements Listener {
             }
 
             case "opacity" -> {
-                TextDisplay textDisplay = (TextDisplay) selected;
+                TextDisplay textDisplay = (TextDisplay) selectedDisplay;
                 player.closeInventory();
 
                 player.sendRichMessage("<green>In chat type a number between 0 and 255 for text opacity OR -1 for full");
@@ -460,30 +495,30 @@ public class InventoryClick implements Listener {
                 player.closeInventory();
 
                 player.sendRichMessage("<green>Type in chat the R G B A for the background, eg, 255 100 255 255 <gray>The alpha is optional");
-                backgroundMap.put(uuid, (TextDisplay) selected);
+                backgroundMap.put(uuid, (TextDisplay) selectedDisplay);
             }
 
             case "width" -> {
                 player.closeInventory();
 
                 player.sendRichMessage("<green>Type in chat the line width, default is 200");
-                widthMap.put(uuid, (TextDisplay) selected);
+                widthMap.put(uuid, (TextDisplay) selectedDisplay);
             }
 
             case "alignleft" -> {
-                final TextDisplay textDisplay = (TextDisplay) selected;
+                final TextDisplay textDisplay = (TextDisplay) selectedDisplay;
 
                 textDisplay.setAlignment(TextDisplay.TextAlignment.LEFT);
                 player.sendRichMessage("<green>Set alignment left");
             }
             case "aligncenter" -> {
-                final TextDisplay textDisplay = (TextDisplay) selected;
+                final TextDisplay textDisplay = (TextDisplay) selectedDisplay;
 
                 textDisplay.setAlignment(TextDisplay.TextAlignment.CENTER);
                 player.sendRichMessage("<green>Set alignment center");
             }
             case "alignright" -> {
-                final TextDisplay textDisplay = (TextDisplay) selected;
+                final TextDisplay textDisplay = (TextDisplay) selectedDisplay;
 
                 textDisplay.setAlignment(TextDisplay.TextAlignment.RIGHT);
                 player.sendRichMessage("<green>Set alignment right");

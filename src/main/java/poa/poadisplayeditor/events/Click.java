@@ -57,6 +57,7 @@ public class Click implements Listener {
         inventory.setItem(10, inventoryItem(Material.DIAMOND_AXE, "<green>Set Item", "setitem"));
         inventory.setItem(11, inventoryItem(Material.WRITABLE_BOOK, "<green>Edit Text", "settext"));
 
+        inventory.setItem(4, inventoryItem(Material.RED_STAINED_GLASS_PANE, "<green>Modify by 0.01", "move0.01"));
         inventory.setItem(5, inventoryItem(Material.RED_STAINED_GLASS_PANE, "<green>Modify by 0.1", "move0.1"));
         inventory.setItem(6, inventoryItem(Material.RED_STAINED_GLASS_PANE, "<green>Modify by 0.5", "move0.5"));
         inventory.setItem(7, inventoryItem(Material.RED_STAINED_GLASS_PANE, "<green>Modify by 1", "move1"));
@@ -97,6 +98,7 @@ public class Click implements Listener {
         inventory.setItem(45, inventoryItem(Material.ANVIL, "<green>Select Nearest Block Display", "selectblock"));
         inventory.setItem(46, inventoryItem(Material.DIAMOND, "<green>Select Nearest Item Display", "selectitem"));
         inventory.setItem(48, inventoryItem(Material.PAINTING, "<green>Easy Select", "selecteasy"));
+        inventory.setItem(49, inventoryItem(Material.CREEPER_HEAD, "<green>Nearest Entity", "selectentity", "<gray>This selects the nearest Entity", "<gray>Useful for moving but nothing else", "<gray>Scale All works for this for 1.20.6+"));
 
         inventory.setItem(22, inventoryItem(Material.BARRIER, "<red>DELETE", "delete"));
 
