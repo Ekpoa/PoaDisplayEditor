@@ -43,17 +43,21 @@ public class LoadEntity implements Listener {
         Bukkit.getScheduler().runTaskLaterAsynchronously(PoaDisplayEditor.getINSTANCE(), () -> SendPacket.sendPacket(player, metadata.build()), delay);
     }
     public static void changeText(Player player, TextDisplay display){
-        changeText(player, display, 1);
+        Bukkit.getScheduler().runTask(PoaDisplayEditor.getINSTANCE(), () -> {
+            changeText(player, display, 1);
+        });
     }
 
     public static void updateTextForAll(TextDisplay display, long delay){
-        final Collection<Player> nearbyPlayers = display.getLocation().getNearbyPlayers(200);
-        if(nearbyPlayers.isEmpty())
-            return;
+        Bukkit.getScheduler().runTask(PoaDisplayEditor.getINSTANCE(), () -> {
+            final Collection<Player> nearbyPlayers = display.getLocation().getNearbyPlayers(200);
+            if (nearbyPlayers.isEmpty())
+                return;
 
-        for (Player p : nearbyPlayers) {
-            changeText(p, display, delay);
-        }
+            for (Player p : nearbyPlayers) {
+                changeText(p, display, delay);
+            }
+        });
     }
     public static void updateTextForAll(TextDisplay display){
         updateTextForAll(display, 1);
