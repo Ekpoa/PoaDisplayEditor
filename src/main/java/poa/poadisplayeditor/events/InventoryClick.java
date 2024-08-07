@@ -188,6 +188,19 @@ public class InventoryClick implements Listener {
                 editingMap.put(uuid, entity);
             }
 
+            case "clone" -> {
+                final EntitySnapshot snapshot = selectedEntity.createSnapshot();
+                final Entity entity = snapshot.createEntity(selectedEntity.getLocation());
+
+                player.sendRichMessage("<green>A direct clone has been spawned in the same position, it is now selected as the modifying display");
+                editingMap.put(uuid, entity);
+
+                if(entity instanceof TextDisplay textDisplay)
+                    LoadEntity.updateTextForAll(textDisplay, 4);
+
+            }
+
+
             case "setblock", "setitem" -> {
                 final Entity entity = editingMap.get(uuid);
                 if (entity instanceof TextDisplay) {
@@ -262,7 +275,13 @@ public class InventoryClick implements Listener {
                 player.sendRichMessage("<green>Moved along Z by " + moveAmount);
             }
             case "moveblock" -> {
-                selectedEntity.teleport(selectedEntity.getLocation().getBlock().getLocation());
+                if(selectedDisplay != null && !(selectedEntity instanceof TextDisplay))
+                    selectedEntity.teleport(selectedEntity.getLocation().getBlock().getLocation());
+                else {
+                    final Location clone = selectedEntity.getLocation().getBlock().getLocation().clone();
+                    clone.add(0.5, 0.5, 0.5);
+                    selectedEntity.teleport(clone);
+                }
                 player.sendRichMessage("<green>Centered to block");
             }
             case "moveeasy" -> {
@@ -444,7 +463,7 @@ public class InventoryClick implements Listener {
             }
 
             case "delete" -> {
-                selectedDisplay.remove();
+                selectedEntity.remove();
                 player.sendRichMessage("<green>Display Deleted :(");
             }
 

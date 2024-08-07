@@ -56,7 +56,7 @@ public class Chat implements Listener {
             player.sendRichMessage("<green>Text display updated");
 
             InventoryClick.newLineTextMap.remove(uuid);
-
+            LoadEntity.updateTextForAll(display, 4);
 
         } else if (InventoryClick.appendTextMap.containsKey(uuid)) {
             e.setCancelled(true);
@@ -70,7 +70,7 @@ public class Chat implements Listener {
             player.sendRichMessage("<green>Text display updated");
 
             InventoryClick.appendTextMap.remove(uuid);
-            LoadEntity.updateTextForAll(display);
+            LoadEntity.updateTextForAll(display,4);
         } else if (InventoryClick.textOpacityMap.containsKey(uuid)) {
             e.setCancelled(true);
             TextDisplay display = InventoryClick.textOpacityMap.get(uuid);

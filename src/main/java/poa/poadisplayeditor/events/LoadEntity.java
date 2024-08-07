@@ -32,7 +32,7 @@ public class LoadEntity implements Listener {
         changeText(player, display);
     }
 
-    public static void changeText(Player player, TextDisplay display){
+    public static void changeText(Player player, TextDisplay display, long delay){
         final Metadata metadata = new Metadata(display.getEntityId());
 
         String text = InventoryClick.getTextComponentText(display);
@@ -40,17 +40,23 @@ public class LoadEntity implements Listener {
         text = PlaceholderAPI.setPlaceholders(player, text);
 
         metadata.setText(text);
-        Bukkit.getScheduler().runTaskLaterAsynchronously(PoaDisplayEditor.getINSTANCE(), () -> SendPacket.sendPacket(player, metadata.build()), 1L);
+        Bukkit.getScheduler().runTaskLaterAsynchronously(PoaDisplayEditor.getINSTANCE(), () -> SendPacket.sendPacket(player, metadata.build()), delay);
+    }
+    public static void changeText(Player player, TextDisplay display){
+        changeText(player, display, 1);
     }
 
-    public static void updateTextForAll(TextDisplay display){
+    public static void updateTextForAll(TextDisplay display, long delay){
         final Collection<Player> nearbyPlayers = display.getLocation().getNearbyPlayers(200);
         if(nearbyPlayers.isEmpty())
             return;
 
         for (Player p : nearbyPlayers) {
-            changeText(p, display);
+            changeText(p, display, delay);
         }
+    }
+    public static void updateTextForAll(TextDisplay display){
+        updateTextForAll(display, 1);
     }
 
 

@@ -57,6 +57,8 @@ public class Click implements Listener {
         inventory.setItem(10, inventoryItem(Material.DIAMOND_AXE, "<green>Set Item", "setitem"));
         inventory.setItem(11, inventoryItem(Material.WRITABLE_BOOK, "<green>Edit Text", "settext"));
 
+        inventory.setItem(13, inventoryItem(Material.GLOW_ITEM_FRAME, "<green>Clone", "clone"));
+
         inventory.setItem(4, inventoryItem(Material.RED_STAINED_GLASS_PANE, "<green>Modify by 0.01", "move0.01"));
         inventory.setItem(5, inventoryItem(Material.RED_STAINED_GLASS_PANE, "<green>Modify by 0.1", "move0.1"));
         inventory.setItem(6, inventoryItem(Material.RED_STAINED_GLASS_PANE, "<green>Modify by 0.5", "move0.5"));
@@ -67,7 +69,7 @@ public class Click implements Listener {
         inventory.setItem(24, inventoryItem(Material.MINECART, "<green>Move Along X", "movex", "<gray>Left click to increase", "<gray>Right click to decrease"));
         inventory.setItem(26, inventoryItem(Material.MINECART, "<green>Move Along Z", "movez", "<gray>Left click to increase", "<gray>Right click to decrease"));
         inventory.setItem(16, inventoryItem(Material.MINECART, "<green>Center To Block", "moveblock"));
-        inventory.setItem(34, inventoryItem(Material.COMMAND_BLOCK_MINECART, "<green>Easy Move", "moveeasy"));
+        inventory.setItem(34, inventoryItem(Material.COMMAND_BLOCK_MINECART, "<green>Easy Move", "moveeasy", "<gray>Make sure the editing item", "<gray>is in hotbar slot 5"));
 
         inventory.setItem(33, inventoryItem(Material.REDSTONE_TORCH, "<green>Change Pitch", "pitch", "<gray>Middle click to set"));
         inventory.setItem(35, inventoryItem(Material.REDSTONE_TORCH, "<green>Change Yaw", "yaw", "<gray>Middle click to set"));
