@@ -52,6 +52,13 @@ public class Click implements Listener {
         if(!InventoryClick.easyEditMap.containsKey(uuid))
             return;
 
+        final ItemStack item = e.getItem();
+        if (item == null || item.getType() != PoaDisplayEditor.getItem())
+            return;
+
+        if (!player.hasPermission("poa.displayedit"))
+            return;
+
         String type = InventoryClick.easyEditMap.get(uuid);
         e.setCancelled(true);
 

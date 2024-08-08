@@ -1,6 +1,7 @@
 /Users/alex/Documents/Plugins/PoaDisplayEditor/src/main/java/poa/poadisplayeditor/util/NearestEntity.java
 /Users/alex/Documents/Plugins/PoaDisplayEditor/src/main/java/poa/poadisplayeditor/events/Click.java
 /Users/alex/Documents/Plugins/PoaDisplayEditor/src/main/java/poa/poadisplayeditor/events/InventoryClick.java
+/Users/alex/Documents/Plugins/PoaDisplayEditor/src/main/java/poa/poadisplayeditor/events/InvOpen.java
 /Users/alex/Documents/Plugins/PoaDisplayEditor/src/main/java/poa/poadisplayeditor/events/ClickBlockItem.java
 /Users/alex/Documents/Plugins/PoaDisplayEditor/src/main/java/poa/poadisplayeditor/events/ScrollEntity.java
 /Users/alex/Documents/Plugins/PoaDisplayEditor/src/main/java/poa/poadisplayeditor/events/Chat.java
