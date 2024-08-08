@@ -43,9 +43,5 @@ public class ScrollEntity implements Listener {
         selectedEntity.teleport(newLocation);
     }
 
-    @EventHandler
-    public void invOpen(InventoryOpenEvent e){
-        if(e.getInventory().getHolder() instanceof GUIHolder)
-            InventoryClick.easyMoveMap.remove(e.getPlayer().getUniqueId());
-    }
+
 }

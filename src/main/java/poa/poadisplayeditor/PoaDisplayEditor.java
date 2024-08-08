@@ -32,6 +32,7 @@ public final class PoaDisplayEditor extends JavaPlugin {
         pm.registerEvents(new LoadEntity(), this);
         pm.registerEvents(new EntityClick(), this);
         pm.registerEvents(new ScrollEntity(), this);
+        pm.registerEvents(new InvOpen(), this);
 
     }
 

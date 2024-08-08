@@ -22,6 +22,7 @@ import poa.poalib.shaded.NBT;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Click implements Listener {
 
@@ -36,9 +37,31 @@ public class Click implements Listener {
         if (!player.hasPermission("poa.displayedit"))
             return;
 
+        if(InventoryClick.easyEditMap.containsKey(player.getUniqueId()))
+            return;
+
         e.setCancelled(true);
         player.openInventory(getGui());
 
+    }
+
+    @EventHandler
+    public void easyEditClick(PlayerInteractEvent e){
+        final Player player = e.getPlayer();
+        final UUID uuid = player.getUniqueId();
+        if(!InventoryClick.easyEditMap.containsKey(uuid))
+            return;
+
+        String type = InventoryClick.easyEditMap.get(uuid);
+        e.setCancelled(true);
+
+        if(player.isSneaking()){
+            player.openInventory(getGui());
+            return;
+        }
+
+        final boolean rightClick = e.getAction().isRightClick();
+        InventoryClick.modifyEntity(type, player, InventoryClick.editingMap.get(uuid), InventoryClick.getMoveAmount(player, rightClick), rightClick);
     }
 
 
@@ -80,15 +103,18 @@ public class Click implements Listener {
         inventory.setItem(52, inventoryItem(Material.COMMAND_BLOCK, "<green>Scale Y", "scaley"));
         inventory.setItem(53, inventoryItem(Material.COMMAND_BLOCK, "<green>Scale Z", "scalez"));
 
+        inventory.setItem(38, inventoryItem(Material.LIGHT, "<green>Brightness", "brightness"));
 
-        inventory.setItem(19, inventoryItem(Material.POWERED_RAIL, "<green>Translation X", "translationx"));
+        inventory.setItem(28, inventoryItem(Material.POWERED_RAIL, "<green>Translation X", "translationx"));
         inventory.setItem(27, inventoryItem(Material.POWERED_RAIL, "<green>Translation Y", "translationy"));
         inventory.setItem(29, inventoryItem(Material.POWERED_RAIL, "<green>Translation Z", "translationz"));
 
         inventory.setItem(36, potionColor(inventoryItem(Material.LINGERING_POTION, "<green>Glow Value", "glowoverride"), 0, 0, 0));
         inventory.setItem(37, potionColor(inventoryItem(Material.LINGERING_POTION, "<green>Glow State", "glow"), 255, 255, 255));
 
-        inventory.setItem(39, inventoryItem(Material.LIGHT, "<green>Brightness", "brightness"));
+
+
+        inventory.setItem(40, inventoryItem(Material.ARROW, "<green>Easy Modify", "easymodify", "<gray>Use left and right click while", "<gray>holding the editor to modify", "<red>Shift click to reopen gui"));
 
         inventory.setItem(41, inventoryItem(Material.ARMOR_STAND, "<green>Billboard Fixed", "billboardfixed"));
         inventory.setItem(42, inventoryItem(Material.ARMOR_STAND, "<green>Billboard Vertical", "billboardvertical"));

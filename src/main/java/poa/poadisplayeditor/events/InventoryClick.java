@@ -17,14 +17,17 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import poa.packets.FakeEntity;
 import poa.packets.SendPacket;
+import poa.poadisplayeditor.PoaDisplayEditor;
 import poa.poadisplayeditor.util.NearestEntity;
 import poa.poadisplayeditor.util.holders.GUIHolder;
+import poa.poalib.Items.CreateItem;
 import poa.poalib.shaded.NBT;
 
 import java.util.*;
@@ -32,6 +35,8 @@ import java.util.*;
 public class InventoryClick implements Listener {
 
     public static Map<UUID, Entity> editingMap = new HashMap<>();
+
+    public static Map<UUID, String> easyEditMap = new HashMap<>();
 
 
     public static Map<UUID, Display> selectItemMap = new HashMap<>();
@@ -58,7 +63,8 @@ public class InventoryClick implements Listener {
     @SneakyThrows
     @EventHandler
     public void invClick(InventoryClickEvent e) {
-        if (!(e.getInventory().getHolder() instanceof GUIHolder))
+        final Inventory inventory = e.getInventory();
+        if (!(inventory.getHolder() instanceof GUIHolder))
             return;
 
         e.setCancelled(true);
@@ -83,13 +89,60 @@ public class InventoryClick implements Listener {
         }
 
 
-        Display selectedDisplay = null;
 
         final Entity selectedEntity = editingMap.get(uuid);
-        if (selectedEntity instanceof Display display)
-            selectedDisplay = display;
 
         float moveAmount = getMoveAmount(player, e.isRightClick());
+
+
+        if(easyEditMap.containsKey(uuid) && easyEditMap.get(uuid).equalsIgnoreCase("selecting")){
+            easyEditMap.put(uuid, type);
+            player.closeInventory();
+            player.sendRichMessage("<green>Easy edit mode active.. Left click or right to edit. Crouch click to reopen gui");
+        }
+
+
+        switch (type.toLowerCase()) {
+            case "easymodify" -> {
+                easyEditMap.put(uuid, "selecting");
+
+                final ItemStack cloned = item.clone();
+                final ItemMeta meta = cloned.getItemMeta();
+                meta.lore(new ArrayList<>(CreateItem.stringListToComponent(List.of("<green><b>Select the mode you wish to use"))));
+                cloned.setItemMeta(meta);
+
+                inventory.setItem(e.getSlot(), cloned);
+
+                player.sendRichMessage("<green>Click the edit mode you wish to use");
+                return;
+            }
+            case "pitch" -> {
+                if (e.getClick() == ClickType.MIDDLE) {
+                    player.closeInventory();
+                    player.sendRichMessage("<green>Type into chat the amount to set the pitch to");
+                    pitchMap.put(uuid, selectedEntity);
+                    return;
+                }
+            }
+            case "yaw" -> {
+                if (e.getClick() == ClickType.MIDDLE) {
+                    player.closeInventory();
+                    player.sendRichMessage("<green>Type into chat the amount to set the pitch to");
+                    yawMap.put(uuid, selectedEntity);
+                    return;
+                }
+            }
+        }
+        modifyEntity(type, player, selectedEntity, moveAmount, e.isRightClick());
+
+    }
+
+
+    public static void modifyEntity(String type, Player player, Entity selectedEntity, float moveAmount, boolean isRightClicked) {
+        UUID uuid = player.getUniqueId();
+        Display selectedDisplay = null;
+        if (selectedEntity instanceof Display display)
+            selectedDisplay = display;
 
         switch (type.toLowerCase()) {
             case "selecttext" -> {
@@ -195,7 +248,7 @@ public class InventoryClick implements Listener {
                 player.sendRichMessage("<green>A direct clone has been spawned in the same position, it is now selected as the modifying display");
                 editingMap.put(uuid, entity);
 
-                if(entity instanceof TextDisplay textDisplay)
+                if (entity instanceof TextDisplay textDisplay)
                     LoadEntity.updateTextForAll(textDisplay, 4);
 
             }
@@ -275,7 +328,7 @@ public class InventoryClick implements Listener {
                 player.sendRichMessage("<green>Moved along Z by " + moveAmount);
             }
             case "moveblock" -> {
-                if(selectedDisplay != null && !(selectedEntity instanceof TextDisplay))
+                if (selectedDisplay != null && !(selectedEntity instanceof TextDisplay))
                     selectedEntity.teleport(selectedEntity.getLocation().getBlock().getLocation());
                 else {
                     final Location clone = selectedEntity.getLocation().getBlock().getLocation().clone();
@@ -297,14 +350,7 @@ public class InventoryClick implements Listener {
 
 
             case "pitch" -> {
-                if (e.getClick() == ClickType.MIDDLE) {
-                    player.closeInventory();
-                    player.sendRichMessage("<green>Type into chat the amount to set the pitch to");
-                    pitchMap.put(uuid, selectedEntity);
-                    return;
-                }
-
-
+                //middle click for setting, handled above
                 if (moveAmount == 0) {
                     player.sendRichMessage("<red>You must select a move amount first");
                     return;
@@ -316,14 +362,7 @@ public class InventoryClick implements Listener {
                 player.sendRichMessage("<green>Moved pitch by " + moveAmount + " pitch: " + selectedEntity.getPitch());
             }
             case "yaw" -> {
-                if (e.getClick() == ClickType.MIDDLE) {
-                    player.closeInventory();
-                    player.sendRichMessage("<green>Type into chat the amount to set the pitch to");
-                    yawMap.put(uuid, selectedEntity);
-                    return;
-                }
-
-
+                //middle click for setting, handled above
                 if (moveAmount == 0) {
                     player.sendRichMessage("<red>You must select a move amount first");
                     return;
@@ -429,7 +468,7 @@ public class InventoryClick implements Listener {
                 if (brightness != null)
                     amount = brightness.getBlockLight();
 
-                if (e.isRightClick())
+                if (isRightClicked)
                     amount--;
                 else
                     amount++;
@@ -544,8 +583,6 @@ public class InventoryClick implements Listener {
             }
 
         }
-
-
     }
 
 
@@ -598,7 +635,7 @@ public class InventoryClick implements Listener {
     }
 
 
-    private static float getMoveAmount(Player player, boolean rightClick) {
+    public static float getMoveAmount(Player player, boolean rightClick) {
         final UUID uuid = player.getUniqueId();
         if (!moveAmountMap.containsKey(uuid))
             return 0;
