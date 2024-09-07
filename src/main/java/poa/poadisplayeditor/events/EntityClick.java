@@ -18,7 +18,7 @@ import java.util.UUID;
 public class EntityClick implements Listener {
 
 
-    @EventHandler //todo fix
+    @EventHandler
     public void onEntityClick(PlayerInteractAtEntityEvent e){
         final Player player = e.getPlayer();
         final UUID uuid = player.getUniqueId();
@@ -43,8 +43,8 @@ public class EntityClick implements Listener {
 
         InventoryClick.entityListMap.remove(uuid);
 
-        for (int i = 0; i < entityList.size(); i++) {
-            entityList.get(i).remove();
+        for (Entity value : entityList) {
+            value.remove();
         }
 
 

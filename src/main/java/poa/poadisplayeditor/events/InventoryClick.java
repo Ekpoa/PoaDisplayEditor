@@ -621,7 +621,10 @@ public class InventoryClick implements Listener {
         if (modifyScaleBy != null)
             scale.add(modifyScaleBy);
 
+
         Quaternionf leftRotation = oldTransform.getLeftRotation();
+
+
         Quaternionf rightRotation = oldTransform.getRightRotation();
         return new Transformation(translation, leftRotation, scale, rightRotation);
     }
