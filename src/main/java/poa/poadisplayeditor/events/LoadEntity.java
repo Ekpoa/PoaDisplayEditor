@@ -44,7 +44,7 @@ public class LoadEntity implements Listener {
     }
     public static void changeText(Player player, TextDisplay display){
         Bukkit.getScheduler().runTask(PoaDisplayEditor.getINSTANCE(), () -> {
-            changeText(player, display, 1);
+            changeText(player, display, 2);
         });
     }
 
@@ -60,7 +60,7 @@ public class LoadEntity implements Listener {
         });
     }
     public static void updateTextForAll(TextDisplay display){
-        updateTextForAll(display, 1);
+        updateTextForAll(display, 2);
     }
 
 
