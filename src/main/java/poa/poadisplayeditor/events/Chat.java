@@ -13,7 +13,7 @@ import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import poa.poadisplayeditor.PoaDisplayEditor;
-import poa.poalib.Messages.Messages;
+import poa.poalib.messages.Messages;
 
 import java.util.UUID;
 

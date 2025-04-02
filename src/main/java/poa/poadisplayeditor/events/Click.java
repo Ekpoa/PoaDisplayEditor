@@ -17,7 +17,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.jetbrains.annotations.Nullable;
 import poa.poadisplayeditor.PoaDisplayEditor;
 import poa.poadisplayeditor.util.holders.GUIHolder;
-import poa.poalib.Items.CreateItem;
+import poa.poalib.items.CreateItem;
 import poa.poalib.shaded.NBT;
 
 import java.util.ArrayList;
