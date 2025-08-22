@@ -26,6 +26,7 @@ import poa.packets.FakeEntity;
 import poa.packets.SendPacket;
 import poa.poadisplayeditor.PoaDisplayEditor;
 import poa.poadisplayeditor.util.NearestEntity;
+import poa.poadisplayeditor.util.PreciseMove;
 import poa.poadisplayeditor.util.holders.GUIHolder;
 import poa.poalib.items.CreateItem;
 import poa.poalib.shaded.NBT;
@@ -44,6 +45,8 @@ public class InventoryClick implements Listener {
     public static Map<UUID, Float> moveAmountMap = new HashMap<>();
 
     public static Map<UUID, Entity> easyMoveMap = new HashMap<>();
+    public static Map<UUID, Entity> precisionMoveMap = new HashMap<>();
+
 
     public static Map<UUID, Entity> pitchMap = new HashMap<>();
     public static Map<UUID, Entity> yawMap = new HashMap<>();
@@ -348,6 +351,18 @@ public class InventoryClick implements Listener {
                 easyMoveMap.put(uuid, selectedEntity);
             }
 
+            case "precisionmove" -> {
+                if (moveAmount == 0) {
+                    player.sendRichMessage("<red>You must select a move amount first");
+                    return;
+                }
+
+                player.closeInventory();
+                player.sendRichMessage("<green>Use the scroll wheel to move the entity, reopen the gui when completed");
+                precisionMoveMap.put(uuid, selectedEntity);
+
+                PreciseMove.preciseMove(player, selectedEntity);
+            }
 
             case "pitch" -> {
                 //middle click for setting, handled above

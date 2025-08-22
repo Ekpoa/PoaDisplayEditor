@@ -99,7 +99,8 @@ public class Click implements Listener {
         inventory.setItem(24, inventoryItem(Material.MINECART, "<green>Move Along X", "movex", "<gray>Left click to increase", "<gray>Right click to decrease"));
         inventory.setItem(26, inventoryItem(Material.MINECART, "<green>Move Along Z", "movez", "<gray>Left click to increase", "<gray>Right click to decrease"));
         inventory.setItem(16, inventoryItem(Material.MINECART, "<green>Center To Block", "moveblock"));
-        inventory.setItem(34, inventoryItem(Material.COMMAND_BLOCK_MINECART, "<green>Easy Move", "moveeasy", "<gray>Make sure the editing item", "<gray>is in hotbar slot 5"));
+        inventory.setItem(17, inventoryItem(Material.COMMAND_BLOCK_MINECART, "<green>Easy Move", "moveeasy", "<gray>Make sure the editing item", "<gray>is in hotbar slot 5", "<gray>scroll wheel to move"));
+        inventory.setItem(34, inventoryItem(Material.HOPPER_MINECART, "<green>Precision Move", "precisionmove", "<gray>Moves entity with you", "<gray>Open gui when you are done"));
 
         inventory.setItem(33, inventoryItem(Material.REDSTONE_TORCH, "<green>Change Pitch", "pitch", "<gray>Middle click to set"));
         inventory.setItem(35, inventoryItem(Material.REDSTONE_TORCH, "<green>Change Yaw", "yaw", "<gray>Middle click to set"));

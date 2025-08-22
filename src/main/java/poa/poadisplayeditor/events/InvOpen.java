@@ -3,6 +3,7 @@ package poa.poadisplayeditor.events;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import poa.poadisplayeditor.util.holders.GUIHolder;
 
 import java.util.UUID;
@@ -15,7 +16,16 @@ public class InvOpen implements Listener {
             final UUID uuid = e.getPlayer().getUniqueId();
             InventoryClick.easyMoveMap.remove(uuid);
             InventoryClick.easyEditMap.remove(uuid);
+            InventoryClick.precisionMoveMap.remove(uuid);
         }
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent e){
+        final UUID uuid = e.getPlayer().getUniqueId();
+        InventoryClick.easyMoveMap.remove(uuid);
+        InventoryClick.easyEditMap.remove(uuid);
+        InventoryClick.precisionMoveMap.remove(uuid);
     }
 
 }
