@@ -82,9 +82,9 @@
           <scope>provided</scope>
       </dependency>
       <dependency>
-          <groupId>com.github.Ekpoa</groupId>
+          <groupId>poa</groupId>
           <artifactId>PoaLib</artifactId>
-          <version>t1.3</version>
+          <version>1</version>
           <scope>provided</scope>
       </dependency>
 

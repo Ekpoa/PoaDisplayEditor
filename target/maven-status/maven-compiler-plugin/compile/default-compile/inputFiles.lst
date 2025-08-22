@@ -1,12 +1,15 @@
 /Users/alex/Documents/Plugins/PoaDisplayEditor/src/main/java/poa/poadisplayeditor/util/NearestEntity.java
 /Users/alex/Documents/Plugins/PoaDisplayEditor/src/main/java/poa/poadisplayeditor/events/Click.java
+/Users/alex/Documents/Plugins/PoaDisplayEditor/src/main/java/poa/poadisplayeditor/structure/commands/DisplayStructureCMD.java
+/Users/alex/Documents/Plugins/PoaDisplayEditor/src/main/java/poa/poadisplayeditor/structure/DisplayStructure.java
+/Users/alex/Documents/Plugins/PoaDisplayEditor/src/main/java/poa/poadisplayeditor/PoaDisplayEditor.java
 /Users/alex/Documents/Plugins/PoaDisplayEditor/src/main/java/poa/poadisplayeditor/events/InventoryClick.java
 /Users/alex/Documents/Plugins/PoaDisplayEditor/src/main/java/poa/poadisplayeditor/events/InvOpen.java
 /Users/alex/Documents/Plugins/PoaDisplayEditor/src/main/java/poa/poadisplayeditor/events/ClickBlockItem.java
+/Users/alex/Documents/Plugins/PoaDisplayEditor/src/main/java/poa/poadisplayeditor/structure/Data.java
 /Users/alex/Documents/Plugins/PoaDisplayEditor/src/main/java/poa/poadisplayeditor/events/ScrollEntity.java
 /Users/alex/Documents/Plugins/PoaDisplayEditor/src/main/java/poa/poadisplayeditor/events/Chat.java
 /Users/alex/Documents/Plugins/PoaDisplayEditor/src/main/java/poa/poadisplayeditor/events/LoadEntity.java
 /Users/alex/Documents/Plugins/PoaDisplayEditor/src/main/java/poa/poadisplayeditor/util/PreciseMove.java
 /Users/alex/Documents/Plugins/PoaDisplayEditor/src/main/java/poa/poadisplayeditor/util/holders/GUIHolder.java
-/Users/alex/Documents/Plugins/PoaDisplayEditor/src/main/java/poa/poadisplayeditor/PoaDisplayEditor.java
 /Users/alex/Documents/Plugins/PoaDisplayEditor/src/main/java/poa/poadisplayeditor/events/EntityClick.java

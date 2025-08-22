@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import poa.poadisplayeditor.events.*;
+import poa.poadisplayeditor.structure.commands.DisplayStructureCMD;
 
 public final class PoaDisplayEditor extends JavaPlugin {
 
@@ -33,6 +34,8 @@ public final class PoaDisplayEditor extends JavaPlugin {
         pm.registerEvents(new EntityClick(), this);
         pm.registerEvents(new ScrollEntity(), this);
         pm.registerEvents(new InvOpen(), this);
+
+        getCommand("displaystructure").setExecutor(new DisplayStructureCMD());
 
     }
 
