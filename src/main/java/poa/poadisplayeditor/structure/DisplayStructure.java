@@ -27,7 +27,7 @@ public class DisplayStructure {
 
     static {
         if(yml.isConfigurationSection("Structures")){
-            allIds = yml.getConfigurationSection("Structures").getKeys(false).stream().toList();
+            allIds = new ArrayList<>(yml.getConfigurationSection("Structures").getKeys(false).stream().toList());
         }
     }
 
@@ -43,6 +43,8 @@ public class DisplayStructure {
         if(!allIds.contains(this.id))
             allIds.add(this.id);
         dataMap.put(this.id, this);
+
+        PoaDisplayEditor.getINSTANCE().getLogger().log(Level.INFO, "loaded display structure with id " + id + " and " + offsetMap.size() + " displays");
     }
 
 
@@ -50,6 +52,9 @@ public class DisplayStructure {
         final String path = "Structures." + this.id + ".";
 
         int i = 0;
+
+        yml.set("Structures." + this.id, null);
+
         for (Map.Entry<EntitySnapshot, Vector> entry : offsetMap.entrySet()) {
             final EntitySnapshot display = entry.getKey();
             final Vector offset = entry.getValue();
@@ -88,8 +93,12 @@ public class DisplayStructure {
         return spawnFromSnapshots(location, structure.getOffsetMap());
     }
 
-    private static DisplayStructure loadStructure(String id){
+    public static DisplayStructure loadStructure(File file, String id){
         id = id.toLowerCase();
+
+        final PoaYaml yml = PoaYaml.loadFromFile(file);
+        if(!file.exists())
+            throw new RuntimeException("FILE NOT FOUND");
 
         if(!yml.isConfigurationSection("Structures." + id))
             return null;
@@ -108,6 +117,10 @@ public class DisplayStructure {
         }
 
         return new DisplayStructure(id, map);
+    }
+
+    private static DisplayStructure loadStructure(String id){
+        return loadStructure(file, id);
     }
 
 
