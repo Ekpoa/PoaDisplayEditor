@@ -41,7 +41,7 @@ public class Chat implements Listener {
             } else if (InventoryClick.yawMap.containsKey(uuid)) {
                 clone.setYaw(amount);
                 InventoryClick.yawMap.remove(uuid);
-                player.sendRichMessage("<green>Set pitch to " + amount);
+                player.sendRichMessage("<green>Set yaw to " + amount);
             }
             Bukkit.getScheduler().runTask(PoaDisplayEditor.getINSTANCE(), () -> entity.teleport(clone));
         } else if (InventoryClick.newLineTextMap.containsKey(uuid)) {

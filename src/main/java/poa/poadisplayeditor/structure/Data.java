@@ -46,6 +46,8 @@ public class Data {
 
         if(saveToFile)
             structure.save();
+
+        player.sendRichMessage("<green>Saved as " + id);
     }
 
     // Create snapshots of all display entities relative to an origin

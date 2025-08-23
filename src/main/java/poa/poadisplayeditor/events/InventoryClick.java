@@ -336,6 +336,8 @@ public class InventoryClick implements Listener {
                 else {
                     final Location clone = selectedEntity.getLocation().getBlock().getLocation().clone();
                     clone.add(0.5, 0.5, 0.5);
+                    clone.setPitch(selectedEntity.getPitch());
+                    clone.setYaw(selectedEntity.getYaw());
                     selectedEntity.teleport(clone);
                 }
                 player.sendRichMessage("<green>Centered to block");

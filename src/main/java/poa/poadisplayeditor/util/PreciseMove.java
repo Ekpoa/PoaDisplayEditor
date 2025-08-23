@@ -19,13 +19,11 @@ public class PreciseMove {
         if (!player.isOnline()) return;
         if (player.getWorld() != entity.getWorld()) return;
 
-        // Use the current player→entity distance as the lock distance
         final double lockDistance = Math.max(
                 0.25,
                 player.getEyeLocation().distance(entity.getLocation())
         );
 
-        // Run every tick; stop when either becomes invalid or changes world
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -43,31 +41,31 @@ public class PreciseMove {
 
                 double targetDist = lockDistance;
 
-                // If there's a block in the way, place the entity just before it
                 RayTraceResult hit = player.getWorld().rayTraceBlocks(
                         eye, dir, lockDistance, FluidCollisionMode.NEVER, true
                 );
                 if (hit != null) {
                     double hitDist = eye.distance(hit.getHitPosition().toLocation(player.getWorld()));
-                    targetDist = Math.max(0.25, hitDist - 0.30); // keep a small gap from the surface
+                    targetDist = Math.max(0.25, hitDist - 0.30);
                 }
 
+                // Preserve entity's current orientation
+                float eYaw = entity.getLocation().getYaw();
+                float ePitch = entity.getLocation().getPitch();
+
                 Location target = eye.clone().add(dir.multiply(targetDist));
+                target.setYaw(eYaw);
+                target.setPitch(ePitch);
 
-                // Face the same way as the player
-                target.setYaw(player.getLocation().getYaw());
-                target.setPitch(player.getLocation().getPitch());
-
-                // Slight vertical tweak for living entities so they sit "on" the line comfortably
                 if (entity instanceof LivingEntity le) {
                     target.subtract(0, le.getHeight() * 0.5, 0);
                 }
 
-                // Teleport smoothly; Paper has teleportAsync but plain teleport works everywhere
                 entity.teleport(target);
             }
         }.runTaskTimer(PoaDisplayEditor.getINSTANCE(), 0L, 1L);
     }
+
 
 
 }

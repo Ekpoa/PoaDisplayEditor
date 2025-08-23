@@ -4,6 +4,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -44,20 +45,19 @@ public class DisplayStructureCMD implements CommandExecutor, TabCompleter {
                 }
 
                 Data.save(player, args[1], true);
-                player.sendRichMessage("<green>Saved as " + args[1]);
             }
             case "paste" -> {
                 if(args.length == 1){
-                    player.sendRichMessage("<red>/displaystructure save <id>");
+                    player.sendRichMessage("<red>/displaystructure paste <id>");
                     return false;
                 }
-                final boolean b = DisplayStructure.spawnStructure(args[1], player.getLocation());
 
-                if(!b){
+                final List<Display> displays = DisplayStructure.spawnStructure(args[1], player.getLocation());
+                if(displays == null){
                     player.sendRichMessage("<red>Failed to paste. Incorrect id?");
                     return false;
                 }
-                player.sendRichMessage("<green>Pasted structure");
+                player.sendRichMessage("<green>Pasted " + displays.size() + " display entities");
             }
 
         }

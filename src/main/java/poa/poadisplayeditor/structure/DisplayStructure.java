@@ -40,6 +40,8 @@ public class DisplayStructure {
     public DisplayStructure(String id, Map<EntitySnapshot, Vector> offsetMap){
         this.id = id.toLowerCase();
         this.offsetMap = offsetMap;
+        if(!allIds.contains(this.id))
+            allIds.add(this.id);
         dataMap.put(this.id, this);
     }
 
@@ -69,7 +71,7 @@ public class DisplayStructure {
     }
 
 
-    public static boolean spawnStructure(String id, Location location){
+    public static List<Display> spawnStructure(String id, Location location){
         id = id.toLowerCase();
 
         DisplayStructure structure;
@@ -80,11 +82,10 @@ public class DisplayStructure {
 
         if(structure == null) {
             PoaDisplayEditor.getINSTANCE().getLogger().log(Level.WARNING, "structure not found with id " + id);
-            return false;
+            return null;
         }
 
-        spawnFromSnapshots(location, structure.getOffsetMap());
-        return true;
+        return spawnFromSnapshots(location, structure.getOffsetMap());
     }
 
     private static DisplayStructure loadStructure(String id){
