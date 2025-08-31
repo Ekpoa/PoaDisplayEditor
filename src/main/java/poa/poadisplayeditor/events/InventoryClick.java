@@ -24,7 +24,6 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import poa.packets.FakeEntity;
 import poa.packets.SendPacket;
-import poa.poadisplayeditor.PoaDisplayEditor;
 import poa.poadisplayeditor.util.NearestEntity;
 import poa.poadisplayeditor.util.PreciseMove;
 import poa.poadisplayeditor.util.holders.GUIHolder;
@@ -67,7 +66,7 @@ public class InventoryClick implements Listener {
     @EventHandler
     public void invClick(InventoryClickEvent e) {
         final Inventory inventory = e.getInventory();
-        if (!(inventory.getHolder() instanceof GUIHolder))
+        if (!(inventory.getHolder() instanceof GUIHolder holder))
             return;
 
         e.setCancelled(true);
@@ -136,12 +135,12 @@ public class InventoryClick implements Listener {
                 }
             }
         }
-        modifyEntity(type, player, selectedEntity, moveAmount, e.isRightClick());
+        modifyEntity(type, player, selectedEntity, moveAmount, e.isRightClick(), holder);
 
     }
 
 
-    public static void modifyEntity(String type, Player player, Entity selectedEntity, float moveAmount, boolean isRightClicked) {
+    public static void modifyEntity(String type, Player player, Entity selectedEntity, float moveAmount, boolean isRightClicked, GUIHolder holder) {
         UUID uuid = player.getUniqueId();
         Display selectedDisplay = null;
         if (selectedEntity instanceof Display display)
@@ -365,6 +364,76 @@ public class InventoryClick implements Listener {
 
                 PreciseMove.preciseMove(player, selectedEntity);
             }
+
+            case "leftrot" -> {
+                if (moveAmount == 0) {
+                    player.sendRichMessage("<red>You must select a move amount first");
+                    return;
+                }
+
+                player.openInventory(rotationGui(true));
+            }
+
+            case "rightrot" -> {
+                if (moveAmount == 0) {
+                    player.sendRichMessage("<red>You must select a move amount first");
+                    return;
+                }
+
+                player.openInventory(rotationGui(false));
+            }
+
+            case "rotx" -> {
+                selectedDisplay.setTransformation(getTransformation(selectedDisplay, holder.isLeftRot(), moveAmount, true, false, false));
+            }
+            case "roty" -> {
+                selectedDisplay.setTransformation(getTransformation(selectedDisplay, holder.isLeftRot(), moveAmount, false, true, false));
+            }
+            case "rotz" -> {
+                selectedDisplay.setTransformation(getTransformation(selectedDisplay, holder.isLeftRot(), moveAmount, false, false, true));
+            }
+
+            case "transformationtype" -> {
+                player.openInventory(guiSlot());
+            }
+
+            case "slotfixed" -> {
+                if(selectedDisplay instanceof ItemDisplay itemDisplay)
+                    itemDisplay.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.FIXED);
+                else
+                    player.sendRichMessage("<red>The selected display is not a item dispay");
+            }
+            case "slothead" -> {
+                if(selectedDisplay instanceof ItemDisplay itemDisplay)
+                    itemDisplay.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.HEAD);
+                else
+                    player.sendRichMessage("<red>The selected display is not a item dispay");
+            }
+            case "slotgui" -> {
+                if(selectedDisplay instanceof ItemDisplay itemDisplay)
+                    itemDisplay.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.GUI);
+                else
+                    player.sendRichMessage("<red>The selected display is not a item dispay");
+            }
+            case "slotthirdperson" -> {
+                if(selectedDisplay instanceof ItemDisplay itemDisplay)
+                    itemDisplay.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.THIRDPERSON_LEFTHAND);
+                else
+                    player.sendRichMessage("<red>The selected display is not a item dispay");
+            }
+            case "slotfirstperson" -> {
+                if(selectedDisplay instanceof ItemDisplay itemDisplay)
+                    itemDisplay.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.FIRSTPERSON_LEFTHAND);
+                else
+                    player.sendRichMessage("<red>The selected display is not a item dispay");
+            }
+            case "slotfloor" -> {
+                if(selectedDisplay instanceof ItemDisplay itemDisplay)
+                    itemDisplay.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.GROUND);
+                else
+                    player.sendRichMessage("<red>The selected display is not a item dispay");
+            }
+
 
             case "pitch" -> {
                 //middle click for setting, handled above
@@ -603,6 +672,37 @@ public class InventoryClick implements Listener {
     }
 
 
+    private static Transformation getTransformation(Display display, boolean isLeft, double moveAmount,
+                                                    boolean x, boolean y, boolean z) {
+        final Transformation t = display.getTransformation();
+
+        // Build a delta rotation from requested axes (ignore 'w' — not meaningful for axis-angle)
+        Quaternionf delta = new Quaternionf().identity();
+        float angle = (float) moveAmount; // radians preferred
+
+        // Compose in X → Y → Z order; adjust order if your use case needs it
+        if (x) delta.rotateX(angle);
+        if (y) delta.rotateY(angle);
+        if (z) delta.rotateZ(angle);
+
+        // If nothing to rotate, return the same transformation
+        if (!x && !y && !z) {
+            return new Transformation(t.getTranslation(), t.getLeftRotation(), t.getScale(), t.getRightRotation());
+        }
+
+        Quaternionf left  = new Quaternionf(t.getLeftRotation());
+        Quaternionf right = new Quaternionf(t.getRightRotation());
+
+        // Apply rotation to the chosen side
+        if (isLeft) {
+            left.mul(delta).normalize();   // existing * delta
+        } else {
+            right.mul(delta).normalize();  // existing * delta
+        }
+
+        return new Transformation(t.getTranslation(), left, t.getScale(), right);
+    }
+
     private static Inventory textGui() {
         Inventory inventory = Bukkit.createInventory(new GUIHolder(), InventoryType.DROPPER, MiniMessage.miniMessage().deserialize("<gold>Text"));
 
@@ -617,6 +717,30 @@ public class InventoryClick implements Listener {
         inventory.setItem(6, Click.inventoryItem(Material.BLUE_STAINED_GLASS_PANE, "<green>Align Left", "alignleft"));
         inventory.setItem(7, Click.inventoryItem(Material.CYAN_STAINED_GLASS_PANE, "<green>  Align Center  ", "aligncenter"));
         inventory.setItem(8, Click.inventoryItem(Material.LIGHT_BLUE_STAINED_GLASS_PANE, "<green>    Align Right", "alignright"));
+        return inventory;
+    }
+
+    private static Inventory guiSlot() {
+        Inventory inventory = Bukkit.createInventory(new GUIHolder(), InventoryType.DROPPER, MiniMessage.miniMessage().deserialize("<gold>Gui Slot"));
+
+        inventory.setItem(1, Click.inventoryItem(Material.STONE, "<green>Fixed", "slotfixed"));
+        inventory.setItem(4, Click.inventoryItem(Material.PLAYER_HEAD, "<green>Head", "slothead"));
+        inventory.setItem(7, Click.inventoryItem(Material.PAINTING, "<green>Gui", "slotgui"));
+        inventory.setItem(2, Click.inventoryItem(Material.GRASS_BLOCK, "<green>Floor", "slotfloor"));
+        inventory.setItem(3, Click.inventoryItem(Material.IRON_HOE, "<green>Third Person Hand", "slotthirdperson"));
+        inventory.setItem(5, Click.inventoryItem(Material.DIAMOND_SWORD, "<green>First Person Hand", "slotfirstperson"));
+        return inventory;
+    }
+
+
+    private static Inventory rotationGui(boolean left) {
+        final GUIHolder owner = new GUIHolder();
+        owner.setLeftRot(left);
+        Inventory inventory = Bukkit.createInventory(owner, InventoryType.HOPPER, MiniMessage.miniMessage().deserialize("<gold>Rotation"));
+
+        inventory.setItem(0, Click.inventoryItem(Material.RED_STAINED_GLASS_PANE, "<red>X", "rotx"));
+        inventory.setItem(1, Click.inventoryItem(Material.YELLOW_STAINED_GLASS_PANE, "<yellow>Y", "roty"));
+        inventory.setItem(2, Click.inventoryItem(Material.ORANGE_STAINED_GLASS_PANE, "<yellow>Z", "rotz"));
         return inventory;
     }
 

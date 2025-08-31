@@ -68,7 +68,7 @@ public class Click implements Listener {
         }
 
         final boolean rightClick = e.getAction().isRightClick();
-        InventoryClick.modifyEntity(type, player, InventoryClick.editingMap.get(uuid), InventoryClick.getMoveAmount(player, rightClick), rightClick);
+        InventoryClick.modifyEntity(type, player, InventoryClick.editingMap.get(uuid), InventoryClick.getMoveAmount(player, rightClick), rightClick, null);
     }
 
 
@@ -94,6 +94,10 @@ public class Click implements Listener {
         inventory.setItem(6, inventoryItem(Material.RED_STAINED_GLASS_PANE, "<green>Modify by 0.5", "move0.5"));
         inventory.setItem(7, inventoryItem(Material.RED_STAINED_GLASS_PANE, "<green>Modify by 1", "move1"));
         inventory.setItem(8, inventoryItem(Material.RED_STAINED_GLASS_PANE, "<green>Modify by 5", "move5"));
+
+        inventory.setItem(18, inventoryItem(Material.CLOCK, "<green>Left Rotation", "leftrot"));
+        inventory.setItem(19, inventoryItem(Material.GRASS_BLOCK, "<green>Display Transformation Type", "transformationtype"));
+        inventory.setItem(20, inventoryItem(Material.CLOCK, "<green>Right Rotation", "rightrot"));
 
         inventory.setItem(25, inventoryItem(Material.MINECART, "<green>Move Up or Down", "movey", "<gray>Left click to increase", "<gray>Right click to decrease"));
         inventory.setItem(24, inventoryItem(Material.MINECART, "<green>Move Along X", "movex", "<gray>Left click to increase", "<gray>Right click to decrease"));
